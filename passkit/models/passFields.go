@@ -1,4 +1,4 @@
-package passkit
+package models
 
 type PassFields struct {
 	AdditionalInfoFields *[]PassFieldContent `json:"additionalInfoFields,omitempty"`

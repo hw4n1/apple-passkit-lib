@@ -1,4 +1,4 @@
-package passkit
+package models
 
 // SemanticTags contains machine-readable metadata the system uses to offer a pass and suggest related actions.
 //

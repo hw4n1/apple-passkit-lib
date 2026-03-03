@@ -1,4 +1,4 @@
-package passkit
+package models
 
 // Pass represents the root pass.json object.
 //
@@ -16,7 +16,7 @@ type Pass struct {
 
 	// ---------------- OPTIONAL ----------------
 
-	AccesibilityURL            *string `json:"accesibilityURL,omitempty"`
+	AccessibilityURL           *string `json:"accessibilityURL,omitempty"`
 	AddOnURL                   *string `json:"addOnURL,omitempty"`
 	AppLaunchURL               *string `json:"appLaunchURL,omitempty"`
 	AssociatedStoreIdentifiers *[]int  `json:"associatedStoreIdentifiers,omitempty"`
