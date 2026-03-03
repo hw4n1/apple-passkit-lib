@@ -2,7 +2,7 @@ package passkit
 
 // PassFieldsContent represents a single field in primaryFields, secondaryFields,
 // auxiliaryFields, headerFields, backFields, or additionalInfoFields.
-//
+
 type PassFieldContent struct {
 
 	// ---------------- REQUIRED ----------------

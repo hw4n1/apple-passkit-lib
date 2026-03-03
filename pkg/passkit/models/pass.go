@@ -39,7 +39,7 @@ type Pass struct {
 	// This key works only for poster event tickets.
 	FooterBackgroundColor *string `json:"footerBackgroundColor,omitempty"`
 
-	//A foreground color for the pass, specified as a CSS-style RGB triple, such as rgb(100, 10, 110).
+	// A foreground color for the pass, specified as a CSS-style RGB triple, such as rgb(100, 10, 110).
 	ForegroundColor    *string      `json:"foregroundColor,omitempty"`
 	GroupingIdentifier *string      `json:"groupingIdentifier,omitempty"`
 	LabelColor         *string      `json:"labelColor,omitempty"`

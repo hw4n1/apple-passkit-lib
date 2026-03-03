@@ -1,8 +1,8 @@
 package passkit
 
-//An object that represents the identifier of a Bluetooth Low Energy beacon the system uses to show a relevant pass.
+// An object that represents the identifier of a Bluetooth Low Energy beacon the system uses to show a relevant pass.
 //
-//See: https://developer.apple.com/documentation/walletpasses/pass/beacons-data.dictionary
+// See: https://developer.apple.com/documentation/walletpasses/pass/beacons-data.dictionary
 
 type Beacons struct {
 	// ---------------- REQUIRED ----------------
