@@ -1,4 +1,4 @@
-package passkit
+package models
 
 type TransitType string
 
@@ -9,8 +9,3 @@ const (
 	TransitTypeBoat    TransitType = "PKTransitTypeBoat"
 	TransitTypeGeneric TransitType = "PKTransitTypeGeneric"
 )
-
-type BoardingPass struct {
-	TransitType TransitType `json:"transitType"`
-	PassFields  *PassFields `json:"passFields,omitempty"`
-}
