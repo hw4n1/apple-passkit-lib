@@ -17,7 +17,7 @@ linters:
     - misspell       
     - bodyclose      
     - noctx          
-    - exportloopref  
+    - copyloopvar
     - godot          
     - gocyclo        
     - dupl           
