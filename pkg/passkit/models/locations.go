@@ -1,8 +1,8 @@
 package passkit
 
-//An object that represents a location that the system uses to show a relevant pass.
+// An object that represents a location that the system uses to show a relevant pass.
 //
-//See: https://developer.apple.com/documentation/walletpasses/pass/locations-data.dictionary
+// See: https://developer.apple.com/documentation/walletpasses/pass/locations-data.dictionary
 
 type Locations struct {
 	// ---------------- REQUIRED ----------------
