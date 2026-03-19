@@ -13,12 +13,57 @@ import (
 	"com.naing/apple-passkit/passkit/models"
 )
 
-/*
-Validates the provided pass
-Ensures pass style is given
-Writes the result json file
-*/
-func Build(passName string, pass models.Pass) error {
+func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
+	if err := build(passName, pass); err != nil {
+		slog.Error("build failed", "err", err)
+		return err
+	}
+
+	if len(assets) == 0 {
+		slog.Info("no assets to write")
+		return nil
+	}
+
+	if err := writeAssets(passName, assets); err != nil {
+		slog.Error("writing assets failed", "err", err)
+		return err
+	}
+
+	return nil
+}
+
+// writeAssets writes the provided assets into the <passName>.pass directory.
+func writeAssets(passName string, assets []models.Asset) error {
+	dir := passName + ".pass"
+
+	if stat, err := os.Stat(dir); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("pass directory does not exist: %s", dir)
+		}
+		return err
+	} else if !stat.IsDir() {
+		return fmt.Errorf("path exists but is not a directory: %s", dir)
+	}
+
+	for _, a := range assets {
+		if a.Name == "" {
+			slog.Warn("skipping asset with empty name")
+			continue
+		}
+
+		path := filepath.Join(dir, a.Name)
+		if err := os.WriteFile(path, a.Data, 0644); err != nil {
+			slog.Error("writing asset failed", "asset", a.Name, "err", err)
+			return err
+		}
+
+		slog.Info("wrote asset", "asset", a.Name, "path", path)
+	}
+
+	return nil
+}
+
+func build(passName string, pass models.Pass) error {
 	// Validate and set defaults
 	if err := ensureRequiredFields(&pass); err != nil {
 		return err
@@ -33,7 +78,7 @@ func Build(passName string, pass models.Pass) error {
 			return err
 		}
 
-		slog.Warn("Directory " + dirName + " already exists")
+		slog.Warn("Directory " + dirName + " already exists. Overwriting pass")
 	}
 
 	filePath := filepath.Join(dirName, "pass.json")
