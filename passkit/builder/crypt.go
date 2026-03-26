@@ -55,6 +55,7 @@ func GenPassManifest(passName string) error {
 	defer manifestFile.Close()
 
 	encoder := json.NewEncoder(manifestFile)
+	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(manifestMap); err != nil {
 		slog.Error("Error encoding manifest to JSON", "err", err)
 		return err
