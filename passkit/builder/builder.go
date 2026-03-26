@@ -29,6 +29,11 @@ func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
 		return err
 	}
 
+	if err := GenPassManifest(passName); err != nil {
+		slog.Error("manifest generation failed", "err", err)
+		return err
+	}
+
 	return nil
 }
 
