@@ -1,4 +1,4 @@
-package passkit
+package models
 
 //An object that represents a location that the system uses to show a relevant pass.
 //
