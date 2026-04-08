@@ -13,6 +13,8 @@ import (
 	"com.naing/apple-passkit/passkit/models"
 )
 
+// BuildPass orchestrates and assembles a complete .pass bundle for the given passName.
+// Creates pass elements (root json, assets and manifest) and signs it
 func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
 	if err := build(passName, pass); err != nil {
 		slog.Error("build failed", "err", err)
@@ -37,7 +39,9 @@ func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
 	return nil
 }
 
-// writeAssets writes the provided assets into the <passName>.pass directory.
+// writeAssets writes given assets into the <passName>.pass directory.
+// Assets with an empty Name field are skipped with a warning. It returns an
+// error if the pass directory does not exist or any file cannot be written.
 func writeAssets(passName string, assets []models.Asset) error {
 	dir := passName + ".pass"
 
@@ -68,6 +72,9 @@ func writeAssets(passName string, assets []models.Asset) error {
 	return nil
 }
 
+// build creates the <passName>.pass directory (or updates it if it already
+// exists), validates and fills in default field values via ensureRequiredFields,
+// and writes the encoded pass as pass.json inside that directory.
 func build(passName string, pass models.Pass) error {
 	// Validate and set defaults
 	if err := ensureRequiredFields(&pass); err != nil {
@@ -114,9 +121,12 @@ func build(passName string, pass models.Pass) error {
 	return nil
 }
 
-/*
-Verifies required & default values and identifiers
-*/
+// ensureRequiredFields validates pass fields and gives default values for optional
+// fields. FormatVersion defaults to 1, SerialNumber to a nanosecond-precision
+// timestamp, Description to "Pass", and OrganizationName to "Organization"
+// If no pass style is set, Generic is used as the default. It returns an error if
+// PassTypeIdentifier or TeamIdentifier is absent, or if more than one pass
+// style is provided.
 func ensureRequiredFields(p *models.Pass) error {
 	if p.FormatVersion == 0 {
 		p.FormatVersion = 1

@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+// fileSHA1 computes the SHA1 hash of the file at filePath and returns it as a
+// lowercase hexadecimal string.
 func fileSHA1(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -27,6 +29,11 @@ func fileSHA1(filePath string) (string, error) {
 	return hashedString, nil
 }
 
+// GenPassManifest generates the manifest.json file for the pass bundle
+// identified by passName. It computes the SHA1 hash of every file in the
+// <passName>.pass directory — excluding any pre-existing manifest.json — and
+// writes the resulting filename-to-hash map to manifest.json inside that
+// directory.
 func GenPassManifest(passName string) error {
 	dirName := passName + ".pass"
 	files, err := os.ReadDir(dirName)
