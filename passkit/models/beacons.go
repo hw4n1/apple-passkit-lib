@@ -1,4 +1,4 @@
-package passkit
+package models
 
 //An object that represents the identifier of a Bluetooth Low Energy beacon the system uses to show a relevant pass.
 //

@@ -1,4 +1,4 @@
-package passkit
+package models
 
 type Barcodes struct {
 

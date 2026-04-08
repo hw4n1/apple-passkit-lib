@@ -1,4 +1,4 @@
-package passkit
+package models
 
 type URLs struct {
 	AccessibilityURL         *string `json:"accessibilityURL,omitempty"`

@@ -1,1 +1,10 @@
+# dev environments
 .env
+**/.idea
+**/.vscode
+
+# built passes
+**/*.pass
+
+# sources
+**/bin

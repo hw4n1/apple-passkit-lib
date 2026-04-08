@@ -1,4 +1,4 @@
-package passkit
+package models
 
 type DataDetectorType string
 type DateStyle string

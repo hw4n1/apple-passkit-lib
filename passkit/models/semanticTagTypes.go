@@ -1,4 +1,4 @@
-package passkit
+package models
 
 // A compilation of data object types for semantic tags.
 // Types that embed SemanticTagTypes: CurrencyAmount, EventDateInfo, Location, PersonNameComponents, Seat, WifiNetwork.

@@ -1,4 +1,4 @@
-package passkit
+package models
 
 // An object that represents a date interval that the system uses to show a relevant pass.
 //

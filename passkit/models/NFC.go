@@ -1,4 +1,4 @@
-package passkit
+package models
 
 // An object that represents the near-field communication (NFC) payload the device passes to an Apple Pay terminal.
 //
