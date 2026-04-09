@@ -25,8 +25,8 @@ type Pass struct {
 	BackgroundColor            *string `json:"backgroundColor,omitempty"`
 	BagPolicyURL               *string `json:"bagPolicyURL,omitempty"`
 
-	Barcodes *Barcodes `json:"barcodes,omitempty"`
-	Beacons  *Beacons  `json:"beacons,omitempty"`
+	Barcodes *[]Barcodes `json:"barcodes,omitempty"`
+	Beacons  *Beacons    `json:"beacons,omitempty"`
 
 	ContactVenueEmail        *string `json:"contactVenueEmail,omitempty"`
 	ContactVenuePhoneNumber  *string `json:"contactVenuePhoneNumber,omitempty"`
