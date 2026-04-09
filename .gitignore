@@ -5,6 +5,7 @@
 
 # built passes
 **/*.pass
+**/*.pkpass
 
 # sources
 **/bin
