@@ -1,9 +1,11 @@
 package builder
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -33,6 +35,15 @@ func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
 
 	if err := GenPassManifest(passName); err != nil {
 		slog.Error("manifest generation failed", "err", err)
+		return err
+	}
+
+	if false == SignPass(passName) {
+		return fmt.Errorf("pass signing failed")
+	}
+
+	if err := zipPass(passName); err != nil {
+		slog.Error("zipping pass failed", "err", err)
 		return err
 	}
 
@@ -118,6 +129,54 @@ func build(passName string, pass models.Pass) error {
 	}
 
 	slog.Info("Built pass", "dir", dirName, "serial", pass.SerialNumber)
+	return nil
+}
+
+// zipPass archives the contents of <passName>.pass/ directly into <passName>.pkpass,
+// placing all files at the root of the archive (no directory prefix).
+func zipPass(passName string) error {
+	passDir := passName + ".pass"
+	pkpassPath := passName + ".pkpass"
+
+	entries, err := os.ReadDir(passDir)
+	if err != nil {
+		return fmt.Errorf("reading pass directory: %w", err)
+	}
+
+	out, err := os.Create(pkpassPath)
+	if err != nil {
+		return fmt.Errorf("creating pkpass file: %w", err)
+	}
+	defer out.Close()
+
+	w := zip.NewWriter(out)
+	defer w.Close()
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		src, err := os.Open(filepath.Join(passDir, entry.Name()))
+		if err != nil {
+			return fmt.Errorf("opening %s: %w", entry.Name(), err)
+		}
+
+		dst, err := w.Create(entry.Name())
+		if err != nil {
+			src.Close()
+			return fmt.Errorf("adding %s to archive: %w", entry.Name(), err)
+		}
+
+		if _, err = io.Copy(dst, src); err != nil {
+			src.Close()
+			return fmt.Errorf("writing %s to archive: %w", entry.Name(), err)
+		}
+
+		src.Close()
+	}
+
+	slog.Info("created pkpass", "path", pkpassPath)
 	return nil
 }
 
