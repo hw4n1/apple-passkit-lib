@@ -2,6 +2,7 @@ package builder
 
 import (
 	"archive/zip"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -49,6 +50,89 @@ func BuildPass(passName string, pass models.Pass, assets []models.Asset) error {
 
 	return nil
 }
+
+// BuildPassBytes orchestrates and assembles a complete .pkpass bundle for the given pass
+// and returns the bytes of the final zipped .pkpass file instead of writing to disk.
+// Uses temporary files internally for the build process but returns only the zipped bytes.
+func BuildPassBytes(pass models.Pass, assets []models.Asset) ([]byte, error) {
+	// Create a temporary directory for intermediate files
+	tmpDir, err := os.MkdirTemp("", "passkit-*")
+	if err != nil {
+		slog.Error("failed to create temp directory", "err", err)
+		return nil, err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// Use a temporary pass name based on the temp directory
+	tempPassName := filepath.Join(tmpDir, "temp-pass")
+
+	// Build the pass using existing functions
+	if err := build(tempPassName, pass); err != nil {
+		slog.Error("build failed", "err", err)
+		return nil, err
+	}
+
+	if len(assets) > 0 {
+		if err := writeAssets(tempPassName, assets); err != nil {
+			slog.Error("writing assets failed", "err", err)
+			return nil, err
+		}
+	}
+
+	if err := GenPassManifest(tempPassName); err != nil {
+		slog.Error("manifest generation failed", "err", err)
+		return nil, err
+	}
+
+	if !SignPass(tempPassName) {
+		return nil, fmt.Errorf("pass signing failed")
+	}
+
+	// Create the pkpass in memory by zipping the temporary directory contents
+	passDir := tempPassName + ".pass"
+	entries, err := os.ReadDir(passDir)
+	if err != nil {
+		return nil, fmt.Errorf("reading pass directory: %w", err)
+	}
+
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		src, err := os.Open(filepath.Join(passDir, entry.Name()))
+		if err != nil {
+			w.Close()
+			return nil, fmt.Errorf("opening %s: %w", entry.Name(), err)
+		}
+
+		dst, err := w.Create(entry.Name())
+		if err != nil {
+			src.Close()
+			w.Close()
+			return nil, fmt.Errorf("adding %s to archive: %w", entry.Name(), err)
+		}
+
+		if _, err = io.Copy(dst, src); err != nil {
+			src.Close()
+			w.Close()
+			return nil, fmt.Errorf("writing %s to archive: %w", entry.Name(), err)
+		}
+
+		src.Close()
+	}
+
+	if err := w.Close(); err != nil {
+		return nil, fmt.Errorf("closing zip writer: %w", err)
+	}
+
+	slog.Info("created pkpass bytes", "size", buf.Len())
+	return buf.Bytes(), nil
+}
+
 
 // writeAssets writes given assets into the <passName>.pass directory.
 // Assets with an empty Name field are skipped with a warning. It returns an
